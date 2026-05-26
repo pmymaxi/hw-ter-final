@@ -163,7 +163,8 @@ locals {
 ## Описание deploy проекта
 В текущем проекте не используются надстроек orchestration модулей таких как Terragrunt, Terraform Stacks, Atmos. Например для простого deploy можно использовать Makefile, переходя по директориям модулей и выполняя их запуск, добавление переменных в переменное окружение итд. В текущем проекте orchestration будем производить in manual mode. Процедура deploy показана на схеме ниже
 
-<img width="1033" height="670" alt="1" src="https://github.com/user-attachments/assets/dc82b71f-b7b7-44a6-9651-b94e68ae5478" />
+<img width="1033" height="670" alt="1" src="https://github.com/user-attachments/assets/2c0f759b-b51f-4310-994a-fcf9f8423563" />
+
 
 Перед началом если нет ssh ключа нужно сгенерировать для дальнейше передачи на VM
 ```bash
@@ -206,7 +207,6 @@ export TF_VAR_access_key="YC........."
 ```
    terraform init -backend-config="access_key=$TF_VAR_access_key" -backend-config="secret_key=$TF_VAR_secret_key"
    ```
-<img width="849" height="328" alt="изображение" src="https://github.com/user-attachments/assets/618e9812-0d79-447e-872b-1e4b9d9c3d79" />
 
 ### Vpc
 ```
@@ -221,16 +221,11 @@ export TF_VAR_access_key="YC........."
  ```
 После выполнения, в outputs появится информация о том, как выполнить push в созданную registry с уже подставлеными значения id registry
 
-<img width="713" height="402" alt="изображение" src="https://github.com/user-attachments/assets/57edc389-403c-4838-b772-adf0682dff9f" />
-
 2. Теперь необходимо собрать наше приложение. В каталогке app_docker root директории, расположены файлы для сборки образа. 
 ```
  docker build . -t cr.yandex/crpkbtv4vev9s5ha6gld/app:1.0.1 -f dockerfile
  docker push cr.yandex/crpkbtv4vev9s5ha6gld/app:1.0.1
 ```
-<img width="1909" height="887" alt="изображение" src="https://github.com/user-attachments/assets/864e0097-fe3c-49f1-aee3-bee63fb6f809" />
-
-
 
 ### Поднимаем vault
 1. Выполним инициализацию  backend s3 с передачей access_key и secret_key
@@ -247,15 +242,13 @@ export TF_VAR_passuser="password"
 terraform apply
 ```
 
-Вывод Outputs
-<img width="927" height="1235" alt="изображение" src="https://github.com/user-attachments/assets/063e9715-5658-45c3-8635-d1174c364807" />
+Вывод Outputs:
 В выводе есть описание "Добавте в перемнное окружение ключ доступа и секрет полученного статистического account" это один из примеров как использовать access_key и secret_key из окружения Vault.
 
 3. Проверим доступность VM и наличе запущенного сервиса Vault в Docker 
 ```
 ssh -i ~/.ssh/id_ed25519 user@<ext_ip or int_ip из outputs>
 ```
-<img width="1328" height="125" alt="изображение" src="https://github.com/user-attachments/assets/c4f7c502-fd4c-4d4c-9741-b8559cfe101d" />
 
 4. Для дальнейшего доступа к Vault в проекте нужен token. Так как в моем проекте я использую demo deploy Vault, в нем уже передана переменная token VAULT_DEV_ROOT_TOKEN_ID: "education".
 Добавим в переменное окружение переменную VAULT_TOKEN. она нужна для авторизации когда будет выполняться terraform
@@ -274,8 +267,7 @@ export VAULT_ADDR=http://<ext_ip or int_ip из outputs>:8200
 vault login
 ```
 - Добавляем значения passuser для системного пользователя VM, access_key и secret_key, значения для формирования MySql.
-  <img width="571" height="773" alt="изображение" src="https://github.com/user-attachments/assets/74225588-48d1-4d69-a6c7-4afc9d8abd0c" />
-- Теперь уберу из переменного окружения ``` unset TF_VAR_access_key && unset TF_VAR_secret_key``` и добавлю через получения в Vault
+- После добавления значений можно убрать из переменного окружения ``` unset TF_VAR_access_key && unset TF_VAR_secret_key``` и добавить через получения в Vault
   ```
   export TF_VAR_access_key=$(vault kv get -field=access_key secret/my-app)
   export TF_VAR_secret_key=$(vault kv get -field=secret_key secret/my-app)
@@ -291,15 +283,17 @@ vault login
    terraform init -backend-config="access_key=$TF_VAR_access_key" -backend-config="secret_key=$TF_VAR_secret_key"
    terraform aplly
 ```
-<img width="484" height="273" alt="изображение" src="https://github.com/user-attachments/assets/c84e63bd-723b-4e9b-b9c7-8f695028e854" />
 
 3. Проверяем что доступ к VM имеется и docker развернул контенеры с stack приложений. 
-<img width="1596" height="152" alt="изображение" src="https://github.com/user-attachments/assets/8afd55dc-4bbd-497e-9d60-844973a1867f" />
+```
+ssh -i ~/.ssh/id_ed25519 user@<ext_ip or int_ip из outputs>
+docker ps
+```
 
 4. Проверяем работу приложения
-<img width="1561" height="237" alt="изображение" src="https://github.com/user-attachments/assets/24964ba6-2c0f-4525-bdeb-9b7c9620885e" />
-<img width="1903" height="221" alt="изображение" src="https://github.com/user-attachments/assets/e72e1abd-df0f-436e-8956-afcf3623e5da" />
-
+```
+curl IP
+```
 Приложение работает инфраструктура равзвернута успешно. 
 
 
