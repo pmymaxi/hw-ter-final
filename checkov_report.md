@@ -1,4 +1,4 @@
-
+```bash
 
        _               _
    ___| |__   ___  ___| | _______   __
@@ -80,3 +80,4 @@ Check: CKV_YC_2: "Ensure compute instance does not have public IP."
 	File: /vm_module/main.tf:5-55
 	Calling File: /vault/main.tf:2-27
 
+```
