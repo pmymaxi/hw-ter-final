@@ -252,6 +252,7 @@ terraform apply
 ```
 
 Вывод Outputs
+
 <img width="892" height="1427" alt="изображение" src="https://github.com/user-attachments/assets/8365dfd6-ff44-4483-88d3-735e7b8a6dae" />
 
 В выводе есть описание "Добавте в перемнное окружение ключ доступа и секрет полученного статистического account" это один из примеров как использовать access_key и secret_key из окружения Vault.
@@ -292,22 +293,41 @@ vault login
 1. Для начало проверим переменные:
    - ```variable "cluster_create"; default = true``` deploy Mysql сервиса включен;
    - Проверим переменную ```vm_module.app.public_ip = true``` получение внешнего Ip адреса.
-   -  
+   
 2. Выполним инициализацию  backend s3 с передачей access_key и secret_key и apply
 ```
    terraform init -backend-config="access_key=$TF_VAR_access_key" -backend-config="secret_key=$TF_VAR_secret_key"
    terraform aplly
 ```
-<img width="484" height="273" alt="изображение" src="https://github.com/user-attachments/assets/c84e63bd-723b-4e9b-b9c7-8f695028e854" />
+<img width="1102" height="743" alt="изображение" src="https://github.com/user-attachments/assets/ac3d7485-690a-4a16-8cc9-9b25c9d12a57" />
 
-3. Проверяем что доступ к VM имеется и docker развернул контенеры с stack приложений. 
-<img width="1596" height="152" alt="изображение" src="https://github.com/user-attachments/assets/8afd55dc-4bbd-497e-9d60-844973a1867f" />
+3. Проверяем что доступ к VM имеется и docker развернул контенеры с stack приложений.
 
-4. Проверяем работу приложения
-<img width="1561" height="237" alt="изображение" src="https://github.com/user-attachments/assets/24964ba6-2c0f-4525-bdeb-9b7c9620885e" />
-<img width="1903" height="221" alt="изображение" src="https://github.com/user-attachments/assets/e72e1abd-df0f-436e-8956-afcf3623e5da" />
+<img width="1558" height="932" alt="изображение" src="https://github.com/user-attachments/assets/aea98e46-a082-4b0f-b567-b9be89fe12ed" />
+
+5. Проверяем работу приложения
+<img width="668" height="311" alt="изображение" src="https://github.com/user-attachments/assets/a94a52de-ec2b-474f-bcd8-780bf4e279db" />
 
 Приложение работает инфраструктура равзвернута успешно. 
+
+## Результат в Yandex Cloud
+### s3
+<img width="1622" height="1625" alt="изображение" src="https://github.com/user-attachments/assets/d06e63f4-fb59-4c4d-8991-550b9692b273" />
+
+### Container registry
+<img width="1488" height="400" alt="изображение" src="https://github.com/user-attachments/assets/8a0d9341-bba0-474b-9d50-6bfd8208e5aa" />
+
+### Vpc
+<img width="1623" height="1498" alt="изображение" src="https://github.com/user-attachments/assets/aa3daed3-7450-4aca-a6d6-0ef4c3b79fdc" />
+
+### MySql
+<img width="907" height="841" alt="изображение" src="https://github.com/user-attachments/assets/2f004d70-dfe1-4a56-a576-c0dccd5b8539" />
+
+### App and Vault 
+<img width="1909" height="318" alt="изображение" src="https://github.com/user-attachments/assets/68204e8e-06a7-47ae-ba44-7e4b6f206db5" />
+
+
+
 
 
 
