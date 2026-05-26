@@ -7,9 +7,9 @@ terraform {
 
   }
 
-/*   required_version = "~>1.12.0"
+  required_version = "~>1.12.0"
   
-   backend "s3" {
+/*    backend "s3" {
     bucket = "dev-stor-hw-ter"
     key    = "s3/terraform.tfstate"
     region = "ru-central1"
