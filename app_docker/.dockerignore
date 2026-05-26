@@ -1,0 +1,33 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+LICENSE
+README*
+
+# git
+.git/
+.gitignore
+
+#directoty
+haproxy/
+nginx/
+tools/
+doc/
+
+#all
+schema.pdf
+
+# env files (ОЧЕНЬ ВАЖНО)
+.env
+
+# Docker
+Dockerfile*
+dockerfile*
+*yaml
+*yml
+.dockerignore
+/hw06_swarm/
+/hw_05_repo/

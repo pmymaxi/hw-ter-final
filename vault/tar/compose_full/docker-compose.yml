@@ -1,0 +1,37 @@
+services:
+  vault:
+    image: vault:1.13.3
+    container_name: vault
+
+    restart: unless-stopped
+
+    ports:
+      - "8200:8200"
+
+    cap_add:
+      - IPC_LOCK
+
+    environment:
+      VAULT_LOCAL_CONFIG: |
+        {
+          "storage": {
+            "file": {
+              "path": "/vault/file"
+            }
+          },
+          "listener": [{
+            "tcp": {
+              "address": "0.0.0.0:8200",
+              "tls_disable": true
+            }
+          }],
+          "ui": true
+        }
+
+    command: server
+
+    volumes:
+      - vault-data:/vault/file
+
+volumes:
+  vault-data: {}

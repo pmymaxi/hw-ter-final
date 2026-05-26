@@ -1,0 +1,32 @@
+# STAGE 0 dirty build
+FROM python:3.12-slim AS builder
+WORKDIR /app
+COPY requirements.txt .
+# чистый build
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+
+# STAGE 1 clean build
+
+FROM python:3.12-slim AS worker
+LABEL maintainer="pmymaxi:hw5"
+EXPOSE 5000
+
+WORKDIR /app
+
+# копируем только готовые библиотеки из Stage 0
+RUN apt-get update && apt-get install -y default-mysql-client
+COPY --from=builder /install /usr/local
+
+#Создаем user от имени которого будет запускаться app
+RUN useradd -m -d /app -U python
+
+#копируем все сразу с правами (нет слоя chown)
+COPY --chown=python:python . .
+RUN chmod 774 ./checkdb.sh
+RUN rm requirements.txt
+USER python
+
+# Запускаем приложение с помощью uvicorn, делая его доступным по сети
+ENTRYPOINT ["./checkdb.sh"]
+#CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000"] 

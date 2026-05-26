@@ -1,0 +1,39 @@
+#cloud-config
+
+users:
+  - name: ${name}
+    groups: ${groups}
+    shell: /bin/bash
+    sudo: 'ALL=(ALL) NOPASSWD:ALL'
+    ssh_authorized_keys:
+      - ${ssh_public}
+
+chpasswd:
+  list: |
+    ${name}:${passwd}
+  expire: false
+      
+package_update: ${package_update}
+package_upgrade: ${package_upgrade}
+
+packages:
+%{ for i in packages ~}
+    -${i}
+%{ endfor ~}
+
+
+runcmd:
+  - install -m 0755 -d /etc/apt/keyrings
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+  - chmod a+r /etc/apt/keyrings/docker.asc
+  - echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo $VERSION_CODENAME) stable" > /etc/apt/sources.list.d/docker.list
+  - apt-get update
+  - apt-get install -y mc docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+  - usermod -aG docker ${name}
+  - | 
+      mkdir -p /home/${name}/docker/vault/
+      chown -R ${name}:${name} /home/${name}/docker
+      mkdir -p /home/${name}/tmp/aws/
+      cd /home/${name}/tmp/aws/ && curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && unzip awscliv2.zip && sudo ./aws/install
+      AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" aws --region ru-central1 --endpoint-url=https://storage.yandexcloud.net s3 cp s3://${name_bucket}/${file_bucket} /home/${name}/docker/vault/${basename}
+      cd /home/${name}/docker/vault/ && docker compose up -d

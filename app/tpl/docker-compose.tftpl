@@ -1,0 +1,38 @@
+include: 
+  - proxy.yaml
+# Якоря производительности, env file
+x-deploy: &deploy-dev
+  deploy:
+    resources:
+      limits:
+        cpus: "1"
+        memory: 512M
+      reservations:
+        memory: 256M
+x-env_file: &env_file
+  env_file:
+    - .env
+x-restart: &restart
+  restart: on-failure #Сервис должен всегда перезапускаться в случае ошибок
+
+services:
+  # конфигурация сервиса web
+  web:
+    image: cr.yandex/${registry_id}/app:1.0.1
+    <<: [*deploy-dev, *env_file, *restart]
+    environment:
+      - DB_HOST=$${DB_HOST}
+      - DB_NAME=$${DB_NAME}
+      - DB_USER=$${DB_USER}
+      - DB_PASSWORD=$${DB_PASSWORD}
+    # Определение сети: в bridge сети с названием backend и statIP 172.20.0.5
+    networks: 
+      backend:
+        ipv4_address: 172.20.0.5
+        
+networks:
+  backend:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 172.20.0.0/24
